@@ -1,0 +1,30 @@
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+      os: [ubuntu-24.04, ubuntu-22.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+
+      - name: Mock build.yaml file
+        run: |
+          cat <<EOF > build.yaml
+          ---
+          include:
+            - board: nice_nano_v2
+              shield: corne_left
+              snippet: studio-rpc-usb-uart
+            - board: nice_nano_v2
+              shield: corne_right
+          EOF
+
+      - name: Install yaml2json
+        run: pipx install remarshal
+
+      - name: Fetch Build Matrix
+        run: |
+          yaml2json "build.yaml" | jq
